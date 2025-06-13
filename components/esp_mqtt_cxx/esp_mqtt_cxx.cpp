@@ -163,7 +163,6 @@ Client::Client(esp_mqtt_client_config_t const &config) :  handler(esp_mqtt_clien
         throw MQTTException(ESP_FAIL);
     };
     CHECK_THROW_SPECIFIC(esp_mqtt_client_register_event(handler.get(), MQTT_EVENT_ANY, mqtt_event_handler, this), mqtt::MQTTException);
-    CHECK_THROW_SPECIFIC(esp_mqtt_client_start(handler.get()), mqtt::MQTTException);
 }
 
 void Client::mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) noexcept

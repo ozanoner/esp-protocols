@@ -166,6 +166,21 @@ public:
     Client(const esp_mqtt_client_config_t &config);
 
     /**
+     * @brief Start the MQTT client
+     *
+     * This function starts the MQTT client and connects to the broker.
+     * It should be called after the client is configured.
+     *
+     * @throws MQTTException if the client fails to start.
+     */
+    void start() const {
+        if (handler == nullptr) {
+            throw MQTTException(ESP_FAIL);
+        };
+        CHECK_THROW_SPECIFIC(esp_mqtt_client_start(handler.get()), mqtt::MQTTException);
+    }
+
+    /**
      * @brief Subscribe to topic
      *
      * @param topic_filter MQTT topic filter
