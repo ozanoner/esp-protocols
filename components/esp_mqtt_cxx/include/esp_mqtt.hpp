@@ -15,6 +15,7 @@
 #include <utility>
 #include <memory>
 #include <string>
+#include <string_view>
 #include "esp_exception.hpp"
 #include "esp_mqtt_client_config.hpp"
 #include "mqtt_client.h"
@@ -223,6 +224,30 @@ public:
         auto size = std::distance(first, last);
         auto res =  esp_mqtt_client_publish(handler.get(), topic.c_str(), &(*first), size, static_cast<int>(qos),
                                             static_cast<int>(retain));
+        if (res < 0) {
+            return std::nullopt;
+        }
+        return MessageID{res};
+    }
+
+    /**
+     * @brief publish message to topic
+     *
+     * @tparam Container Type for data container. Must be a contiguous memory.
+     * @param topic Topic name
+     * @param message Message struct containing data, qos and retain
+     * configuration.
+     *
+     * @return Optional MessageID. In case of failure std::nullopt is returned.
+     */
+    template <class Container>
+    std::optional<MessageID> publish(const std::string_view &topic, const Message<Container> &message)
+    {
+        // return publish(topic, std::begin(message.data), std::end(message.data), message.qos, message.retain);
+        auto size = std::distance(std::begin(message.data), std::end(message.data));
+
+        auto res =  esp_mqtt_client_publish(handler.get(), topic.data(), &(*std::begin(message.data)), size, static_cast<int>(message.qos),
+                                            static_cast<int>(message.retain));
         if (res < 0) {
             return std::nullopt;
         }
